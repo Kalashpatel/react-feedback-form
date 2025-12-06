@@ -91,24 +91,11 @@ All styling is done in **App.css**, including:
 
 ---
 
-## 🖼️ Add Screenshots  
-Create a folder:
 
-```
-/public/screenshots/
-```
 
-Add your project images and link them like:
-
-```markdown
 ![Feedback Form](public/screenshots/Screenshot%202025-12-06%20194415.png)
 ![Feedback Card](public/screenshots/Screenshot%202025-12-06%20194424.png)
-```
+
 
 ---
 
-## 👍 You're Done!
-
-A clean, simple project that covers **all essential real-world React form concepts**.
-
-If you want a more advanced README, Bootstrap version, or live demo deployment guide — just ask!
