@@ -1,126 +1,156 @@
 import React, { useState, useRef } from "react";
-import StepsList from "./StepsList";
-import SuggestionsList from "./SuggestionsList";
-import FormField from "./FormField";
 
 export default function FeedbackForm({ onSubmit }) {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    category: "",
-    priority: "",
-    description: "",
-    steps: [""],
-    suggestions: [""],
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [category, setCategory] = useState("");
+  const [priority, setPriority] = useState("");
+  const [description, setDescription] = useState("");
+
+  const [steps, setSteps] = useState([""]);
+  const [suggestions, setSuggestions] = useState([""]);
 
   const screenshotRef = useRef(null);
   const notesRef = useRef(null);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const addStep = () => setSteps([...steps, ""]);
+  const removeStep = (i) => setSteps(steps.filter((_, index) => index !== i));
+
+  const addSuggestion = () => setSuggestions([...suggestions, ""]);
+  const removeSuggestion = (i) =>
+    setSuggestions(suggestions.filter((_, index) => index !== i));
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const data = {
-      ...form,
+    onSubmit({
+      name,
+      email,
+      category,
+      priority,
+      description,
+      steps,
+      suggestions,
       screenshot: screenshotRef.current.value,
       notes: notesRef.current.value,
       time: new Date().toLocaleString(),
-    };
-
-    onSubmit(data);
-
-    setForm({
-      name: "",
-      email: "",
-      category: "",
-      priority: "",
-      description: "",
-      steps: [""],
-      suggestions: [""],
     });
+
+    // Clear form
+    setName("");
+    setEmail("");
+    setCategory("");
+    setPriority("");
+    setDescription("");
+    setSteps([""]);
+    setSuggestions([""]);
     screenshotRef.current.value = "";
     notesRef.current.value = "";
   };
 
   return (
-    <form className="card p-3 mb-4" onSubmit={handleSubmit}>
-      <h4>Submit Feedback</h4>
+    <form className="feedback-form" onSubmit={handleSubmit}>
+      <h2>Submit Feedback</h2>
 
-      <FormField
-        label="Full Name"
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        required
+      <input
+        type="text"
+        placeholder="Full Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
 
-      <FormField
-        label="Email"
-        name="email"
+      <input
         type="email"
-        value={form.email}
-        onChange={handleChange}
-        required
+        placeholder="Email Address"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
 
-      <FormField
-        label="Description"
-        name="description"
-        as="textarea"
-        value={form.description}
-        onChange={handleChange}
-        required
-      />
+      <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        <option value="">Select Category</option>
+        <option value="Bug">Bug</option>
+        <option value="Suggestion">Suggestion</option>
+        <option value="Complaint">Complaint</option>
+        <option value="Other">Other</option>
+      </select>
 
-      <div className="mb-2">
-        <label>Issue Category</label>
-        <select
-          className="form-select"
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-        >
-          <option value="">Select...</option>
-          <option>Bug</option>
-          <option>Suggestion</option>
-          <option>Complaint</option>
-          <option>Other</option>
-        </select>
-      </div>
+      <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+        <option value="">Priority Level</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
 
-      <div className="mb-2">
-        <label>Priority</label>
-        <select
-          className="form-select"
-          name="priority"
-          value={form.priority}
-          onChange={handleChange}
-        >
-          <option value="">Select...</option>
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
-      </div>
+      <textarea
+        placeholder="Detailed Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      ></textarea>
 
-      <StepsList form={form} setForm={setForm} />
-      <SuggestionsList form={form} setForm={setForm} />
+      {/* Steps to Reproduce */}
+      <h4>Steps to Reproduce:</h4>
+      <button type="button" className="add-row-btn" onClick={addStep}>
+        + Add Step
+      </button>
 
-      <div className="mb-2">
-        <label>Screenshot URL (optional)</label>
-        <input ref={screenshotRef} className="form-control" />
-      </div>
+      {steps.map((step, i) => (
+        <div key={i}>
+          <input
+            type="text"
+            placeholder={`Step ${i + 1}`}
+            value={step}
+            onChange={(e) =>
+              setSteps(steps.map((val, idx) => (idx === i ? e.target.value : val)))
+            }
+          />
+          {steps.length > 1 && (
+            <button
+              type="button"
+              className="remove-btn"
+              onClick={() => removeStep(i)}
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      ))}
 
-      <div className="mb-2">
-        <label>Additional Notes</label>
-        <textarea ref={notesRef} className="form-control" rows="2" />
-      </div>
+      {/* Suggestions */}
+      <h4>Suggested Improvements:</h4>
+      <button type="button" className="add-row-btn" onClick={addSuggestion}>
+        + Add Suggestion
+      </button>
 
-      <button className="btn btn-primary mt-2">Submit</button>
+      {suggestions.map((sug, i) => (
+        <div key={i}>
+          <input
+            type="text"
+            placeholder={`Suggestion ${i + 1}`}
+            value={sug}
+            onChange={(e) =>
+              setSuggestions(
+                suggestions.map((val, idx) => (idx === i ? e.target.value : val))
+              )
+            }
+          />
+          {suggestions.length > 1 && (
+            <button
+              type="button"
+              className="remove-btn"
+              onClick={() => removeSuggestion(i)}
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      ))}
+
+      <input type="text" placeholder="Screenshot URL (optional)" ref={screenshotRef} />
+      <textarea placeholder="Additional Notes" ref={notesRef}></textarea>
+
+      <button className="submit-btn" type="submit">
+        Submit Feedback
+      </button>
     </form>
   );
 }
